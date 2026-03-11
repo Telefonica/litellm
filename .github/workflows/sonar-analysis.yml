@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   run-sonar-analysis:
-    runs-on: cdorunner-aura-default
+    runs-on: litellm-arc-runners
     steps:
       - uses: actions/checkout@v4
         with:
