@@ -62,4 +62,4 @@ jobs:
             -Dsonar.sources=litellm/
             -Dsonar.verbose=true
             -Dsonar.python.version=3.13
-            -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/build/**,**/.venv/**,**/.env/**,**/.git/**,**/.github/**,**/.vscode/**,**/.idea/**,**/__pycache__/**,**/*.md,**/*.yml,**/*.yaml,**/*.json,**/out/**"
+            -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/build/**,**/.venv/**,**/.env/**,**/.git/**,**/.github/**,**/.vscode/**,**/.idea/**,**/__pycache__/**,**/*.md,**/*.yml,**/*.yaml,**/*.json,**/out/**/*"
