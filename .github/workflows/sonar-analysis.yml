@@ -8,9 +8,45 @@ jobs:
   run-sonar-analysis:
     runs-on: litellm-arc-runners
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: 3.13
+
+      - name: Run image
+        uses: abatilo/actions-poetry@v3
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+
+      - uses: actions/cache@v5
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+
+      - name: Install project dependencies
+        run: |
+          poetry install --with dev,proxy-dev --extras "proxy semantic-router"
+          poetry run pip install pytest-cov "pytest-retry==1.6.3" pytest-xdist openapi-core "google-genai==1.22.0" \
+            "google-cloud-aiplatform>=1.38" "fastapi-offline==1.7.3" "python-multipart==0.0.22"
+
+
+
+      - name: Run tests
+        run: |
+          poetry run pytest --cov-report term-missing -v --cov=litellm --cov-report=xml test/**unit_test** \
+            -n 2 \
+            --reruns 1 \
+            --reruns-delay 1 \
+            --dist=loadscope \
+            --durations=20 || echo "Tests failed, but continuing to SonarQube analysis."
+
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v7
         env:
@@ -22,4 +58,5 @@ jobs:
             -Dsonar.projectKey=LiteLLM
             -Dsonar.sources=litellm/
             -Dsonar.verbose=true
-            -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/build/**,**/.venv/**,**/.env/**,**/.git/**,**/.github/**,**/.vscode/**,**/.idea/**,**/__pycache__/**,**/*.md,**/*.yml,**/*.yaml,**/*.json"
+            -Dsonar.python.version=3.13
+            -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/build/**,**/.venv/**,**/.env/**,**/.git/**,**/.github/**,**/.vscode/**,**/.idea/**,**/__pycache__/**,**/*.md,**/*.yml,**/*.yaml,**/*.json,**/out/**"
