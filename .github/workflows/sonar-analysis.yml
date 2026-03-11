@@ -1,0 +1,25 @@
+name: "SonarQube Analysis"
+on:
+  push:
+    branches:
+      - 'main'
+  workflow_dispatch:
+jobs:
+  run-sonar-analysis:
+    runs-on: cdorunner-aura-default
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectName=LiteLLM
+            -Dsonar.projectKey=LiteLLM
+            -Dsonar.sources=litellm/
+            -Dsonar.verbose=true
+            -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/build/**,**/.venv/**,**/.env/**,**/.git/**,**/.github/**,**/.vscode/**,**/.idea/**,**/__pycache__/**,**/*.md,**/*.yml,**/*.yaml,**/*.json"
