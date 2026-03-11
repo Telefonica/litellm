@@ -11,45 +11,44 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 1
-      - uses: actions/setup-python@v6
-        with:
-          python-version: 3.13
 
-      - name: Prepare environment
-        run: |
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      # TODO: Install gcc to build some dependencies.
+      # - uses: actions/setup-python@v6
+      #   with:
+      #     python-version: 3.13
 
-      - name: Run image
-        uses: abatilo/actions-poetry@v3
+      # - name: Prepare environment
+      #   run: |
+      #     echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Install dependencies
-        run: |
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
+      # - name: Run image
+      #   uses: abatilo/actions-poetry@v3
 
-      - uses: actions/cache@v5
-        name: Define a cache for the virtual environment based on the dependencies lock file
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+      # - name: Install dependencies
+      #   run: |
+      #     poetry config virtualenvs.create true --local
+      #     poetry config virtualenvs.in-project true --local
 
-      - name: Install project dependencies
-        run: |
-          poetry install --with dev,proxy-dev --extras "proxy semantic-router"
-          poetry run pip install pytest-cov "pytest-retry==1.6.3" pytest-xdist openapi-core "google-genai==1.22.0" \
-            "google-cloud-aiplatform>=1.38" "fastapi-offline==1.7.3" "python-multipart==0.0.22"
+      # - uses: actions/cache@v5
+      #   name: Define a cache for the virtual environment based on the dependencies lock file
+      #   with:
+      #     path: ./.venv
+      #     key: venv-${{ hashFiles('poetry.lock') }}
 
+      # - name: Install project dependencies
+      #   run: |
+      #     poetry install --with dev,proxy-dev --extras "proxy semantic-router"
+      #     poetry run pip install pytest-cov "pytest-retry==1.6.3" pytest-xdist openapi-core "google-genai==1.22.0" \
+      #       "google-cloud-aiplatform>=1.38" "fastapi-offline==1.7.3" "python-multipart==0.0.22"
 
-
-      - name: Run tests
-        run: |
-          poetry run pytest --cov-report term-missing -v --cov=litellm --cov-report=xml test/**unit_test** \
-            -n 2 \
-            --reruns 1 \
-            --reruns-delay 1 \
-            --dist=loadscope \
-            --durations=20 || echo "Tests failed, but continuing to SonarQube analysis."
-
+      # - name: Run tests
+      #   run: |
+      #     poetry run pytest --cov-report term-missing -v --cov=litellm --cov-report=xml test/**unit_test** \
+      #       -n 2 \
+      #       --reruns 1 \
+      #       --reruns-delay 1 \
+      #       --dist=loadscope \
+      #       --durations=20 || echo "Tests failed, but continuing to SonarQube analysis."
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v7
