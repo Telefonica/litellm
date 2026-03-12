@@ -2,8 +2,12 @@ name: "SonarQube Analysis"
 on:
   push:
     branches:
-      - 'main'
+      - "main"
   workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   run-sonar-analysis:
     runs-on: litellm-arc-runners
