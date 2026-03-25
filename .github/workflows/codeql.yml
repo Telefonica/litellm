@@ -19,6 +19,7 @@ permissions:
 
 jobs:
   analyze:
+    if: github.event_name != 'schedule' || github.repository == 'BerriAI/litellm'
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
